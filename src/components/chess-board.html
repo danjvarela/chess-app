@@ -1,0 +1,7 @@
+<import from="./chess-square"></import>
+
+<div class="w-[600px] aspect-square grid grid-cols-8 grid-rows-8">
+  <template repeat.for="square of squares">
+    <chess-square id.bind="square"></chess-square>
+  </template>
+</div>
