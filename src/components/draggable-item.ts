@@ -38,6 +38,11 @@ export class DraggableItem {
   }
 
   @bound
+  onDragend(e: any) {
+    e.target.style.zIndex = "unset";
+  }
+
+  @bound
   onMousedown(e: any) {
     if (e.button !== 0) return;
 
@@ -56,6 +61,7 @@ export class DraggableItem {
     this.updatePositionOffsets({ x, y });
 
     target.style.transform = `translate(${x}px, ${y}px)`;
+    target.style.zIndex = "9999";
   }
 
   attached() {
@@ -70,6 +76,7 @@ export class DraggableItem {
           ],
           listeners: {
             move: this.onDragMove,
+            end: this.onDragend,
           },
         })
         .on("down", this.onMousedown)
