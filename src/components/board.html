@@ -1,0 +1,21 @@
+<import from="./square"></import>
+<import from="./piece"></import>
+<import from="./draggable-item"></import>
+<import from="./dropzone-item"></import>
+
+<div class="grid grid-cols-8 grid-rows-8 w-full h-full relative" ref="boardRef">
+  <template repeat.for="square of squares">
+    <dropzone-item accept="draggable-item.piece">
+      <chess-square square.bind="square"></chess-square>
+    </dropzone-item>
+  </template>
+
+  <template repeat.for="piece of pieces">
+    <draggable-item class="absolute w-1/8 z-[2] piece">
+      <chess-piece
+        piece.bind="{type: piece.type, color: piece.color}"
+        square.bind="piece.square"
+      ></chess-piece>
+    </draggable-item>
+  </template>
+</div>
