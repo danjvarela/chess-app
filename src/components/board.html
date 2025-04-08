@@ -3,7 +3,10 @@
 <import from="./draggable-item"></import>
 <import from="./dropzone-item"></import>
 
-<div class="grid grid-cols-8 grid-rows-8 w-full h-full relative" ref="boardRef">
+<div
+  class="ca:grid ca:grid-cols-8 ca:grid-rows-8 ca:w-full ca:h-full ca:relative"
+  ref="boardRef"
+>
   <template repeat.for="square of squares">
     <dropzone-item accept="draggable-item.piece">
       <chess-square square.bind="square"></chess-square>
@@ -12,7 +15,7 @@
 
   <template repeat.for="piece of pieces">
     <draggable-item
-      class="absolute w-1/8 z-[2] piece"
+      class="ca:absolute ca:w-1/8 ca:z-[2] piece"
       style.bind="pieceStyle(piece.square)"
     >
       <chess-piece

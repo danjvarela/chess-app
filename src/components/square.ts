@@ -24,7 +24,7 @@ export class Square {
 
   protected get background() {
     return this.type === "light"
-      ? "var(--color-teal-100)"
-      : "var(--color-teal-500)";
+      ? "var(--ca-color-teal-100)"
+      : "var(--ca-color-teal-500)";
   }
 }
