@@ -46,8 +46,20 @@ export class Draggable {
   }
 
   @bound
-  private ondragstart() {
+  private ondragstart(e: any) {
     this.isDragged = true;
+
+    const target = e.interactable.target;
+    this.positionOffsetsBeforePickup = this.getPositionOffsets(target);
+    this.moveCenterToCursor(target, e);
+    target.style.zIndex = "9999";
+
+    target.dispatchEvent(
+      new CustomEvent(Draggable.EVENTS.PICKED_UP, {
+        bubbles: false,
+        cancelable: false,
+      }),
+    );
   }
 
   @bound
@@ -90,17 +102,11 @@ export class Draggable {
   private onmousedown(e: any) {
     if (e.button !== 0) return;
 
-    const target = e.interactable.target;
-    this.positionOffsetsBeforePickup = this.getPositionOffsets(target);
-    this.moveCenterToCursor(target, e);
-    target.style.zIndex = "9999";
+    const interaction = e._interaction;
 
-    target.dispatchEvent(
-      new CustomEvent(Draggable.EVENTS.PICKED_UP, {
-        bubbles: false,
-        cancelable: false,
-      }),
-    );
+    if (!interaction._interacting) {
+      interaction.start({ name: "drag" }, e.interactable, e.currentTarget);
+    }
   }
 
   @bound
