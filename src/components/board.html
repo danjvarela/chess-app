@@ -1,16 +1,13 @@
 <import from="./square"></import>
 <import from="./piece"></import>
-<import from="../resources/custom-attributes/draggable"></import>
-<import from="../resources/custom-attributes/dropzone"></import>
 
 <div
   class="ca:grid ca:grid-cols-8 ca:grid-rows-8 ca:w-full ca:h-full ca:relative"
-  ref="boardRef"
 >
   <template repeat.for="square of squares">
     <chess-square
       square.bind="square"
-      dropzone-for="chess-piece"
+      dropzone-for.bind="possibleSquares.includes(square) ? pickedUpPiece.element : null"
     ></chess-square>
   </template>
 
@@ -21,6 +18,7 @@
       class="ca:absolute ca:w-1/8 ca:z-[2]"
       style.bind="pieceStyle(piece.square)"
       draggable
+      draggable-picked-up.trigger="onpickup($event, piece)"
     ></chess-piece>
   </template>
 </div>

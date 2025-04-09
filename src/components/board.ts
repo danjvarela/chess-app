@@ -1,14 +1,15 @@
 import { IChessService } from "@/services/chess-service";
 import { customElement, resolve } from "aurelia";
-import { Square, SQUARES } from "chess.js";
+import { Square, SQUARES, Piece } from "chess.js";
+
+type PieceDetails = Piece & { square: Square };
 
 @customElement("chess-board")
 export class Board {
   squares: Square[] = SQUARES;
+  pickedUpPiece: (PieceDetails & { element: HTMLElement }) | null = null;
 
   private chessService: IChessService = resolve(IChessService);
-
-  protected boardRef: HTMLElement;
 
   protected pieceStyle(square: Square) {
     // prettier-ignore
@@ -29,5 +30,14 @@ export class Board {
       .board()
       .flatMap((item) => item)
       .filter((item) => item);
+  }
+
+  protected onpickup(e: CustomEvent, pieceDetails: Piece & { square: Square }) {
+    this.pickedUpPiece = { ...pieceDetails, element: e.target as HTMLElement };
+  }
+
+  protected get possibleSquares() {
+    if (!this.pickedUpPiece) return [];
+    return this.chessService.moves({ square: this.pickedUpPiece.square });
   }
 }

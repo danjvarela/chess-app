@@ -1,52 +1,192 @@
-import { customAttribute, INode, resolve, bound, bindable } from "aurelia";
+import {
+  customAttribute,
+  INode,
+  resolve,
+  bound,
+  bindable,
+  IContainer,
+  Scope,
+} from "aurelia";
+import {
+  convertToRenderLocation,
+  CustomElement,
+  CustomElementDefinition,
+  ICustomElementController,
+  IPlatform,
+  ISyntheticView,
+  ViewFactory,
+} from "@aurelia/runtime-html";
 import interact from "interactjs";
+import { Interactable } from "@interactjs/core/Interactable";
+import dropzoneHoverOverlayTemplate from "./dropzone-hover-overlay.html";
+import dropzoneHintTemplate from "./dropzone-hint.html";
 
 @customAttribute({ name: "dropzone", aliases: ["dropzone-for"] })
 export class Dropzone {
   private element: HTMLElement = resolve(INode) as HTMLElement;
-  @bindable private accept: string | HTMLElement;
+  @bindable private accept: string | HTMLElement | undefined;
+  private interact: Interactable | null = null;
+
+  private hoverOverlayView: ISyntheticView;
+  private hoverOverlayController: ICustomElementController<any>;
+
+  private hintView: ISyntheticView;
+  private hintController: ICustomElementController<any>;
+
+  private platform: IPlatform = resolve(IPlatform);
+  private diContainer = resolve(IContainer);
 
   attached() {
     if (!this.element) return;
+    this.interact = interact(this.element);
+  }
 
-    interact(this.element).dropzone({
+  detaching() {
+    this.removeInteract();
+    this.removeOverlay();
+  }
+
+  protected acceptChanged(value: Dropzone["accept"]) {
+    if (value) {
+      this.addInteractDropzone();
+    } else {
+      this.removeInteract();
+    }
+  }
+
+  private addInteractDropzone() {
+    this.interact.dropzone({
       accept: this.accept,
       ondragenter: this.ondragenter,
       ondragleave: this.ondragleave,
       ondrop: this.ondrop,
+      ondropactivate: this.ondropactivate,
+      ondropdeactivate: this.ondropdeactivate,
     });
+  }
+
+  private removeInteract() {
+    this.interact.unset();
   }
 
   @bound
   private ondragenter(e: any) {
-    const target = e.target;
-    const targetRect = target.getBoundingClientRect();
-
-    const overlay = document.createElement("div");
-    Object.assign(overlay.style, {
-      position: "fixed",
-      backgroundColor: `color-mix(in oklab, var(--ca-color-amber-200) 45%, transparent)`,
-      top: `${targetRect.top}px`,
-      left: `${targetRect.left}px`,
-      width: `${targetRect.width}px`,
-      height: `${targetRect.height}px`,
-    });
-    overlay.classList.add("dropzone-hover-overlay");
-
-    target.appendChild(overlay);
+    this.showHoverOverlay(e.target);
   }
 
   @bound
-  private ondragleave(e: any) {
-    this.removeOverlay(e.target);
+  private ondragleave() {
+    this.removeOverlay();
   }
 
   @bound
-  private ondrop(e: any) {
-    this.removeOverlay(e.target);
+  private ondrop() {
+    this.removeOverlay();
   }
 
-  private removeOverlay(element: HTMLElement) {
-    element.querySelector(".dropzone-hover-overlay").remove();
+  @bound
+  private ondropactivate(e: any) {
+    this.showDropHint(e.target);
+  }
+
+  @bound
+  private ondropdeactivate(e: any) {
+    this.removeHint();
+  }
+
+  private removeOverlay() {
+    if (this.hoverOverlayView && this.hoverOverlayController) {
+      this.hoverOverlayView.deactivate(
+        this.hoverOverlayView,
+        this.hoverOverlayController,
+      );
+    }
+  }
+
+  private removeHint() {
+    if (this.hintView && this.hintController) {
+      this.hintView.deactivate(this.hintView, this.hintController);
+    }
+  }
+
+  private async showHoverOverlay(element: HTMLElement) {
+    const template = this.platform.document.createElement("template");
+    template.innerHTML = dropzoneHoverOverlayTemplate;
+    element.appendChild(template);
+    const renderLocation = convertToRenderLocation(template);
+    const factory = new ViewFactory(
+      this.diContainer,
+      CustomElementDefinition.create({
+        name: "dropzone-hover-overlay",
+        template,
+      }),
+    );
+
+    try {
+      this.hoverOverlayController = CustomElement.for(element);
+      this.hoverOverlayView = factory
+        .create(this.hoverOverlayController)
+        .setLocation(renderLocation);
+
+      const elementRect = element.getBoundingClientRect();
+
+      const viewModel = {
+        style: {
+          top: `${elementRect.top}px`,
+          left: `${elementRect.left}px`,
+          width: `${elementRect.width}px`,
+          height: `${elementRect.height}px`,
+        },
+      };
+
+      await this.hoverOverlayView.activate(
+        this.hoverOverlayView,
+        this.hoverOverlayController,
+        Scope.create(viewModel),
+      );
+    } catch (error) {
+      console.error("The provided node does not host a custom element.", error);
+    }
+  }
+
+  private async showDropHint(element: HTMLElement) {
+    const template = this.platform.document.createElement("template");
+    template.innerHTML = dropzoneHintTemplate;
+    element.appendChild(template);
+    const renderLocation = convertToRenderLocation(template);
+    const factory = new ViewFactory(
+      this.diContainer,
+      CustomElementDefinition.create({
+        name: "dropzone-hint",
+        template,
+      }),
+    );
+
+    try {
+      this.hintController = CustomElement.for(element);
+      this.hintView = factory
+        .create(this.hintController)
+        .setLocation(renderLocation);
+
+      const elementRect = element.getBoundingClientRect();
+
+      const viewModel = {
+        style: {
+          top: `${elementRect.top}px`,
+          left: `${elementRect.left}px`,
+          width: `${elementRect.width}px`,
+          height: `${elementRect.height}px`,
+        },
+      };
+
+      console.log("xxx showing hint", element);
+      await this.hintView.activate(
+        this.hintView,
+        this.hintController,
+        Scope.create(viewModel),
+      );
+    } catch (error) {
+      console.error("The provided node does not host a custom element.", error);
+    }
   }
 }

@@ -1,13 +1,19 @@
 import { INode, resolve, customAttribute, bound } from "aurelia";
 import interact from "interactjs";
+import { Interactable } from "@interactjs/core/Interactable";
 
 type PositionOffsets = { x: number; y: number };
 
 @customAttribute({ name: "draggable" })
 export class Draggable {
+  static EVENTS = {
+    PICKED_UP: "draggable-picked-up" as const,
+  };
+
   private element: HTMLElement = resolve(INode) as HTMLElement;
   private isDragged: boolean;
   private positionOffsetsBeforePickup: PositionOffsets;
+  private interact: Interactable | null = null;
 
   attached() {
     this.element.classList.add("ca:cursor-grab", "ca:active:cursor-grabbing");
@@ -16,7 +22,7 @@ export class Draggable {
 
     this.positionOffsetsBeforePickup = currentPositionOffsets;
 
-    interact(this.element)
+    this.interact = interact(this.element)
       .draggable({
         modifiers: [
           interact.modifiers.restrictRect({
@@ -33,6 +39,10 @@ export class Draggable {
       .on("up", this.onmouseup)
       .on("contextmenu", (e) => e.preventDefault())
       .styleCursor(false);
+  }
+
+  detaching() {
+    this.interact.unset();
   }
 
   @bound
@@ -59,6 +69,12 @@ export class Draggable {
     const dropzone = e.relatedTarget;
     const draggedItem = e.target;
 
+    if (!dropzone) {
+      // you dropped it in a non-dropzone element or in a dropzone that does not accept this draggable
+      this.restorePositionOffsetsBeforePickup(draggedItem);
+      return;
+    }
+
     const draggedItemRect = draggedItem.getBoundingClientRect();
     const dropzoneRect = dropzone.getBoundingClientRect();
 
@@ -73,11 +89,18 @@ export class Draggable {
   @bound
   private onmousedown(e: any) {
     if (e.button !== 0) return;
-    this.positionOffsetsBeforePickup = this.getPositionOffsets(
-      e.interactable.target,
+
+    const target = e.interactable.target;
+    this.positionOffsetsBeforePickup = this.getPositionOffsets(target);
+    this.moveCenterToCursor(target, e);
+    target.style.zIndex = "9999";
+
+    target.dispatchEvent(
+      new CustomEvent(Draggable.EVENTS.PICKED_UP, {
+        bubbles: false,
+        cancelable: false,
+      }),
     );
-    this.moveCenterToCursor(e.interactable.target, e);
-    e.interactable.target.style.zIndex = "9999";
   }
 
   @bound
