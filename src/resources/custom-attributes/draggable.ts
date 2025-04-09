@@ -11,7 +11,6 @@ export class Draggable {
   };
 
   private element: HTMLElement = resolve(INode) as HTMLElement;
-  private isDragged: boolean;
   private positionOffsetsBeforePickup: PositionOffsets;
   private interact: Interactable | null = null;
 
@@ -36,7 +35,6 @@ export class Draggable {
         },
       })
       .on("down", this.onmousedown)
-      .on("up", this.onmouseup)
       .on("contextmenu", (e) => e.preventDefault())
       .styleCursor(false);
   }
@@ -47,8 +45,6 @@ export class Draggable {
 
   @bound
   private ondragstart(e: any) {
-    this.isDragged = true;
-
     const target = e.interactable.target;
     this.positionOffsetsBeforePickup = this.getPositionOffsets(target);
     this.moveCenterToCursor(target, e);
@@ -107,17 +103,6 @@ export class Draggable {
     if (!interaction._interacting) {
       interaction.start({ name: "drag" }, e.interactable, e.currentTarget);
     }
-  }
-
-  @bound
-  private onmouseup(e: any) {
-    e.interactable.target.style.zIndex = "unset";
-
-    if (!this.isDragged) {
-      this.restorePositionOffsetsBeforePickup(e.interactable.target);
-    }
-
-    this.isDragged = false;
   }
 
   private restorePositionOffsetsBeforePickup(element: HTMLElement) {
