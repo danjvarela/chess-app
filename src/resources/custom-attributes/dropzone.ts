@@ -24,7 +24,9 @@ import dropzoneHintTemplate from "./dropzone-hint.html";
 @customAttribute({ name: "dropzone", aliases: ["dropzone-for"] })
 export class Dropzone {
   private element: HTMLElement = resolve(INode) as HTMLElement;
-  @bindable private accept: string | HTMLElement | undefined;
+
+  @bindable accept: string | HTMLElement | undefined;
+
   private interact: Interactable | null = null;
 
   private hoverOverlayView: ISyntheticView;
@@ -42,31 +44,23 @@ export class Dropzone {
   }
 
   detaching() {
-    this.removeInteract();
+    this.interact?.unset();
     this.removeOverlay();
   }
 
   protected acceptChanged(value: Dropzone["accept"]) {
     if (value) {
-      this.addInteractDropzone();
+      this.interact = interact(this.element).dropzone({
+        accept: value,
+        ondragenter: this.ondragenter,
+        ondragleave: this.ondragleave,
+        ondrop: this.ondrop,
+        ondropactivate: this.ondropactivate,
+        ondropdeactivate: this.ondropdeactivate,
+      });
     } else {
-      this.removeInteract();
+      this.interact?.unset();
     }
-  }
-
-  private addInteractDropzone() {
-    this.interact.dropzone({
-      accept: this.accept,
-      ondragenter: this.ondragenter,
-      ondragleave: this.ondragleave,
-      ondrop: this.ondrop,
-      ondropactivate: this.ondropactivate,
-      ondropdeactivate: this.ondropdeactivate,
-    });
-  }
-
-  private removeInteract() {
-    this.interact.unset();
   }
 
   @bound
@@ -90,7 +84,8 @@ export class Dropzone {
   }
 
   @bound
-  private ondropdeactivate(e: any) {
+  private ondropdeactivate() {
+    console.log("xxx drop deactivated");
     this.removeHint();
   }
 
