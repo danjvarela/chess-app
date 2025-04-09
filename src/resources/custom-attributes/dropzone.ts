@@ -85,7 +85,6 @@ export class Dropzone {
 
   @bound
   private ondropdeactivate() {
-    console.log("xxx drop deactivated");
     this.removeHint();
   }
 
@@ -174,7 +173,6 @@ export class Dropzone {
         },
       };
 
-      console.log("xxx showing hint", element);
       await this.hintView.activate(
         this.hintView,
         this.hintController,
