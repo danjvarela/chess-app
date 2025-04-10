@@ -16,12 +16,11 @@
   <template repeat.for="piece of piecesOnBoard">
     <chess-piece
       piece.bind="{type: piece.type, color: piece.color}"
-      square.bind="piece.square"
-      class="ca:absolute ca:w-1/8 ca:z-[99]"
+      class="ca:absolute ca:w-1/8 ca:z-[20]"
       style.bind="pieceStyle(piece.square)"
       draggable
-      draggable-picked-up.trigger="onpickup($event, piece)"
-      draggable-dropped.trigger="ondrop($event, piece)"
+      draggable-pickup.trigger="onpickup($event, piece)"
+      draggable-drop.trigger="ondrop($event, piece)"
     ></chess-piece>
   </template>
 </div>

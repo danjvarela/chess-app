@@ -7,8 +7,8 @@ type PositionOffsets = { x: number; y: number };
 @customAttribute({ name: "draggable" })
 export class Draggable {
   static EVENTS = {
-    PICKED_UP: "draggable-picked-up" as const,
-    DROPPED: "draggable-dropped" as const,
+    PICKUP: "draggable-pickup" as const,
+    DROP: "draggable-drop" as const,
   };
 
   private element: HTMLElement = resolve(INode) as HTMLElement;
@@ -52,7 +52,7 @@ export class Draggable {
     target.style.zIndex = "9999";
 
     target.dispatchEvent(
-      new CustomEvent(Draggable.EVENTS.PICKED_UP, {
+      new CustomEvent(Draggable.EVENTS.PICKUP, {
         bubbles: false,
         cancelable: false,
       }),
@@ -95,7 +95,7 @@ export class Draggable {
     this.updatePositionOffsets({ x, y }, draggedItem);
 
     draggedItem.dispatchEvent(
-      new CustomEvent(Draggable.EVENTS.DROPPED, {
+      new CustomEvent(Draggable.EVENTS.DROP, {
         bubbles: false,
         cancelable: false,
         detail: {
