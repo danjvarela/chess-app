@@ -1,6 +1,8 @@
 import { IChessService } from "@/services/chess-service";
-import { customElement, resolve } from "aurelia";
+import { CustomElement, customElement, resolve, watch } from "aurelia";
 import { Square, SQUARES, Piece } from "chess.js";
+import { ICustomElementController } from "@aurelia/runtime-html";
+import { Square as SquareController } from "./square";
 
 type PieceDetails = Piece & { square: Square };
 
@@ -8,6 +10,12 @@ type PieceDetails = Piece & { square: Square };
 export class Board {
   squares: Square[] = SQUARES;
   pickedUpPiece: (PieceDetails & { element: HTMLElement }) | null = null;
+  piecesOnBoard: PieceDetails[] = [];
+  possibleSquares: Square[] = [];
+
+  constructor() {
+    this.updatePiecesOnBoard();
+  }
 
   private chessService: IChessService = resolve(IChessService);
 
@@ -25,8 +33,8 @@ export class Board {
     };
   }
 
-  get pieces() {
-    return this.chessService
+  updatePiecesOnBoard() {
+    this.piecesOnBoard = this.chessService
       .board()
       .flatMap((item) => item)
       .filter((item) => item);
@@ -34,10 +42,32 @@ export class Board {
 
   protected onpickup(e: CustomEvent, pieceDetails: Piece & { square: Square }) {
     this.pickedUpPiece = { ...pieceDetails, element: e.target as HTMLElement };
+
+    const moves = this.chessService.moves({
+      square: this.pickedUpPiece.square,
+      verbose: true,
+    });
+
+    this.possibleSquares = moves.map((move) => move.to);
   }
 
-  protected get possibleSquares() {
-    if (!this.pickedUpPiece) return [];
-    return this.chessService.moves({ square: this.pickedUpPiece.square });
+  protected ondrop(e: CustomEvent, pieceDetails: Piece & { square: Square }) {
+    const dropzoneSquareController = CustomElement.for(e.detail.dropzone, {
+      optional: true,
+    }) as ICustomElementController<SquareController> | null;
+
+    if (!dropzoneSquareController) return;
+
+    const to = dropzoneSquareController.viewModel.square;
+
+    const executedMove = this.chessService.move({
+      from: pieceDetails.square,
+      to,
+    });
+
+    if (!executedMove) return;
+
+    this.updatePiecesOnBoard();
+    this.possibleSquares = [];
   }
 }

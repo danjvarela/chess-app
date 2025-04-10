@@ -11,14 +11,15 @@
     ></chess-square>
   </template>
 
-  <template repeat.for="piece of pieces">
+  <template repeat.for="piece of piecesOnBoard">
     <chess-piece
       piece.bind="{type: piece.type, color: piece.color}"
       square.bind="piece.square"
-      class="ca:absolute ca:w-1/8 ca:z-[2]"
+      class="ca:absolute ca:w-1/8 ca:z-[2] ca:z-[99]"
       style.bind="pieceStyle(piece.square)"
       draggable
       draggable-picked-up.trigger="onpickup($event, piece)"
+      draggable-dropped.trigger="ondrop($event, piece)"
     ></chess-piece>
   </template>
 </div>
