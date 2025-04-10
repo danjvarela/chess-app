@@ -8,6 +8,7 @@ type PositionOffsets = { x: number; y: number };
 export class Draggable {
   static EVENTS = {
     PICKED_UP: "draggable-picked-up" as const,
+    DROPPED: "draggable-dropped" as const,
   };
 
   private element: HTMLElement = resolve(INode) as HTMLElement;
@@ -72,10 +73,10 @@ export class Draggable {
 
   @bound
   private ondragend(e: any) {
-    e.interactable.target.style.zIndex = "unset";
-
     const dropzone = e.relatedTarget;
-    const draggedItem = e.target;
+    const draggedItem = e.interactable.target;
+
+    draggedItem.style.zIndex = "unset";
 
     if (!dropzone) {
       // you dropped it in a non-dropzone element or in a dropzone that does not accept this draggable
@@ -92,6 +93,16 @@ export class Draggable {
     const y = currentOffsets.y + dropzoneRect.y - draggedItemRect.y;
 
     this.updatePositionOffsets({ x, y }, draggedItem);
+
+    draggedItem.dispatchEvent(
+      new CustomEvent(Draggable.EVENTS.DROPPED, {
+        bubbles: false,
+        cancelable: false,
+        detail: {
+          dropzone,
+        },
+      }),
+    );
   }
 
   @bound
