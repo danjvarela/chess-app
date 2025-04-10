@@ -27,6 +27,7 @@ export class Draggable {
         modifiers: [
           interact.modifiers.restrictRect({
             restriction: "parent",
+            endOnly: true,
           }),
         ],
         listeners: {
