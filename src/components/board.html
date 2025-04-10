@@ -8,14 +8,16 @@
     <chess-square
       square.bind="square"
       dropzone-for.bind="possibleSquares.includes(square) ? pickedUpPiece.element : null"
-    ></chess-square>
+    >
+      <div show.bind="recentMoveSquares.includes(square)" class="ca:absolute ca:w-full ca:h-full ca:bg-amber-400/45"></div>
+    </chess-square>
   </template>
 
   <template repeat.for="piece of piecesOnBoard">
     <chess-piece
       piece.bind="{type: piece.type, color: piece.color}"
       square.bind="piece.square"
-      class="ca:absolute ca:w-1/8 ca:z-[2] ca:z-[99]"
+      class="ca:absolute ca:w-1/8 ca:z-[99]"
       style.bind="pieceStyle(piece.square)"
       draggable
       draggable-picked-up.trigger="onpickup($event, piece)"

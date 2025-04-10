@@ -12,6 +12,7 @@ export class Board {
   pickedUpPiece: (PieceDetails & { element: HTMLElement }) | null = null;
   piecesOnBoard: PieceDetails[] = [];
   possibleSquares: Square[] = [];
+  recentMoveSquares: [Square, Square] | null = null;
 
   constructor() {
     this.updatePiecesOnBoard();
@@ -49,6 +50,7 @@ export class Board {
     });
 
     this.possibleSquares = moves.map((move) => move.to);
+    this.recentMoveSquares = null;
   }
 
   protected ondrop(e: CustomEvent, pieceDetails: Piece & { square: Square }) {
@@ -69,5 +71,6 @@ export class Board {
 
     this.updatePiecesOnBoard();
     this.possibleSquares = [];
+    this.recentMoveSquares = [pieceDetails.square, to];
   }
 }
