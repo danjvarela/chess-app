@@ -1,15 +1,22 @@
-<import from="./square"></import>
-<import from="./piece"></import>
-
 <div
   class="ca:grid ca:grid-cols-8 ca:grid-rows-8 ca:w-full ca:h-full ca:relative"
 >
+  <promotion-piece-selector
+    class="ca:absolute ca:z-[999] ca:w-full ca:h-full"
+    if.bind="isPromoting"
+    piece-promotion-cancel.trigger="onpiecepromotioncancel()"
+    piece-promotion-select.trigger="onpiecepromotionselect($event)"
+  ></promotion-piece-selector>
+
   <template repeat.for="square of squares">
     <chess-square
       square.bind="square"
       dropzone-for.bind="possibleSquares.includes(square) ? pickedUpPiece.element : null"
     >
-      <div show.bind="recentMoveSquares.includes(square)" class="ca:absolute ca:w-full ca:h-full ca:bg-amber-400/45"></div>
+      <div
+        show.bind="recentMoveSquares.includes(square)"
+        class="ca:absolute ca:w-full ca:h-full ca:bg-amber-400/45"
+      ></div>
     </chess-square>
   </template>
 

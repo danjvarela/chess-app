@@ -6,7 +6,6 @@ import {
   KNIGHT,
   PAWN,
   Piece as ChessJsPiece,
-  Square as ChessJsSquare,
   QUEEN,
   ROOK,
   WHITE,
@@ -28,9 +27,6 @@ import whiteRook from "@/assets/pieces/white-rook.png";
 @customElement("chess-piece")
 export class Piece {
   @bindable piece: ChessJsPiece;
-  @bindable square: ChessJsSquare;
-
-  protected style = {};
 
   get pieceSrc() {
     if (!this.piece) return;

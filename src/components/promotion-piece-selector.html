@@ -1,0 +1,23 @@
+<div class="ca:w-full ca:h-full ca:relative">
+  <div class="ca:absolute ca:w-full ca:h-full ca:bg-teal-900/70"></div>
+
+  <div
+    class="ca:absolute ca:left-1/2 ca:top-1/2 ca:-translate-1/2 ca:grid ca:grid-cols-2 ca:grid-rows-2 ca:w-2/8 ca:h-2/8 ca:bg-white ca:rounded-2xl ca:overflow-clip"
+  >
+    <template repeat.for="piece of pieces">
+      <button
+        class="ca:w-full ca:h-full ca:hover:bg-neutral-200 ca:transition ca:cursor-pointer"
+        click.trigger="onselect(piece)"
+      >
+        <chess-piece piece.bind="piece" class="ca:w-full"></chess-piece>
+      </button>
+    </template>
+  </div>
+
+  <button
+    class="ca:absolute ca:left-1/2 ca:-translate-1/2 ca:top-11/16 ca:bg-white ca:rounded-2xl ca:px-6 ca:py-2 ca:text-neutral-900 ca:cursor-pointer ca:transition ca:hover:bg-neutral-200"
+    click.trigger="oncancel()"
+  >
+    Cancel
+  </button>
+</div>
