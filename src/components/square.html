@@ -1,1 +1,15 @@
-<div class="ca:w-full ca:h-full" background.style="background"></div>
+<div class="ca:w-full ca:h-full ca:relative" background.style="background">
+  <span
+    show.bind="isAtTheLeftEdge"
+    class="ca:absolute ca:top-[5%] ca:left-[5%] ca:text-sm ca:font-bold"
+    color.style="labelTextColor"
+    >${square[1]}</span
+  >
+
+  <span
+    show.bind="isAtTheBottomEdge"
+    class="ca:absolute ca:bottom-0 ca:right-[5%] ca:text-sm ca:font-mono ca:font-bold"
+    color.style="labelTextColor"
+    >${square[0]}</span
+  >
+</div>

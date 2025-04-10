@@ -22,6 +22,20 @@ export class Square {
       : oddRowColors[colIndex - 1];
   }
 
+  protected get isAtTheLeftEdge() {
+    return this.square[0] === "a";
+  }
+
+  protected get isAtTheBottomEdge() {
+    return this.square[1] === "1";
+  }
+
+  protected get labelTextColor() {
+    return this.type === "light"
+      ? "var(--ca-color-teal-800)"
+      : "var(--ca-color-teal-50)";
+  }
+
   protected get background() {
     return this.type === "light"
       ? "var(--ca-color-teal-100)"
