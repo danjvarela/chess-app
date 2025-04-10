@@ -116,31 +116,32 @@ export class Dropzone {
       }),
     );
 
-    try {
-      this.hoverOverlayController = CustomElement.for(element);
-      this.hoverOverlayView = factory
-        .create(this.hoverOverlayController)
-        .setLocation(renderLocation);
+    this.hoverOverlayController = CustomElement.for(element, {
+      optional: true,
+    });
 
-      const elementRect = element.getBoundingClientRect();
+    if (!this.hoverOverlayController) return;
 
-      const viewModel = {
-        style: {
-          top: `${elementRect.top}px`,
-          left: `${elementRect.left}px`,
-          width: `${elementRect.width}px`,
-          height: `${elementRect.height}px`,
-        },
-      };
+    this.hoverOverlayView = factory
+      .create(this.hoverOverlayController)
+      .setLocation(renderLocation);
 
-      await this.hoverOverlayView.activate(
-        this.hoverOverlayView,
-        this.hoverOverlayController,
-        Scope.create(viewModel),
-      );
-    } catch (error) {
-      console.error("The provided node does not host a custom element.", error);
-    }
+    const elementRect = element.getBoundingClientRect();
+
+    const viewModel = {
+      style: {
+        top: `${elementRect.top}px`,
+        left: `${elementRect.left}px`,
+        width: `${elementRect.width}px`,
+        height: `${elementRect.height}px`,
+      },
+    };
+
+    await this.hoverOverlayView.activate(
+      this.hoverOverlayView,
+      this.hoverOverlayController,
+      Scope.create(viewModel),
+    );
   }
 
   private async showDropHint(element: HTMLElement) {
@@ -156,30 +157,29 @@ export class Dropzone {
       }),
     );
 
-    try {
-      this.hintController = CustomElement.for(element);
-      this.hintView = factory
-        .create(this.hintController)
-        .setLocation(renderLocation);
+    this.hintController = CustomElement.for(element, { optional: true });
 
-      const elementRect = element.getBoundingClientRect();
+    if (!this.hintController) return;
 
-      const viewModel = {
-        style: {
-          top: `${elementRect.top}px`,
-          left: `${elementRect.left}px`,
-          width: `${elementRect.width}px`,
-          height: `${elementRect.height}px`,
-        },
-      };
+    this.hintView = factory
+      .create(this.hintController)
+      .setLocation(renderLocation);
 
-      await this.hintView.activate(
-        this.hintView,
-        this.hintController,
-        Scope.create(viewModel),
-      );
-    } catch (error) {
-      console.error("The provided node does not host a custom element.", error);
-    }
+    const elementRect = element.getBoundingClientRect();
+
+    const viewModel = {
+      style: {
+        top: `${elementRect.top}px`,
+        left: `${elementRect.left}px`,
+        width: `${elementRect.width}px`,
+        height: `${elementRect.height}px`,
+      },
+    };
+
+    await this.hintView.activate(
+      this.hintView,
+      this.hintController,
+      Scope.create(viewModel),
+    );
   }
 }
